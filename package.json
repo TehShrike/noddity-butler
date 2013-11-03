@@ -1,0 +1,29 @@
+{
+  "name": "noddity-butler",
+  "version": "0.0.1",
+  "main": "./index.js",
+  "author": {
+    "name": "TehShrike",
+    "email": "me@JoshDuff.com",
+    "url": "http://joshduff.com"
+  },
+  "description": "Retrieve remote blog files, arrange them appropriately, and present them to the master of the house",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TehShrike/noddity-butler.git"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap ./test/*.js"
+  },
+  "devDependencies": {
+    "tap": "~0.4.4",
+    "send": "~0.1.4"
+  },
+  "dependencies": {
+    "stringmap": "~0.2.2",
+    "async": "~0.2.9"
+  }
+}
