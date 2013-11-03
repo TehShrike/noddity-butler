@@ -25,6 +25,6 @@
   "dependencies": {
     "stringmap": "~0.2.2",
     "async": "~0.2.9",
-    "noddity-retrieval": "0.0.1"
+    "noddity-retrieval": "1.0.0"
   }
 }
