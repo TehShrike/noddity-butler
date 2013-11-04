@@ -2,20 +2,38 @@ var NoddityRetrieval = require('noddity-retrieval')
 var StringMap = require('stringmap')
 var async = require('async')
 var kind = require('kind')
+var sorted = require('sorted')
+
+var postComparator = function(a, b) {
+	if (a.metadata.date == b.metadata.date) {
+		return 0
+	} else if (a.metadata.date < b.metadata.date) {
+		return -1
+	} else {
+		return 1
+	}
+}
 
 var postManager = function(retrieval) {
-	var posts = new StringMap()
+	var postsByFileName = new StringMap()
+	var postsByDate = sorted([], postComparator)
 
-	return function(filename, cb) {
-		if (posts.has(filename)) {
-			cb(false, posts.get(filename))
-		} else {
-			retrieval.getPost(filename, function(err, post) {
-				if (!err) {
-					posts.set(filename, post)
-				}
-				cb(err, post)
-			})
+	return {
+		getPost: function(filename, cb) {
+			if (postsByFileName.has(filename)) {
+				cb(false, postsByFileName.get(filename))
+			} else {
+				retrieval.getPost(filename, function(err, post) {
+					if (!err) {
+						postsByDate.push(post)
+						postsByFileName.set(filename, post)
+					}
+					cb(err, post)
+				})
+			}
+		},
+		getPostsByDate: function(begin, end) {
+			return postsByDate.slice(begin, end)
 		}
 	}
 }
@@ -48,6 +66,14 @@ module.exports = function NoddityButler(host) {
 		turnListOfPostNamesIntoListOfPosts(getPost, postNames, function(err, posts) {
 			cb(err, posts)
 		})
+	}
+
+	var getMostRecentPosts = function(howMany, cb) {
+		if (kind(allPosts) === 'Array') {
+			cb(false, allPosts.slice(-howMany))
+		} else if (kind(postNames) === 'Array') {
+			turnListOfPostNamesIntoListOfPosts
+		}
 	}
 
 	return {
