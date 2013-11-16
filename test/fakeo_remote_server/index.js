@@ -5,8 +5,8 @@ module.exports = function(port, delay) {
 	var server = require('http').createServer(function(req, res) {
 		var respond = function() {
 			send(req, url.parse(req.url).pathname)
-				.root('./test/fakeo_remote_server/')
-				.pipe(res)			
+				.root(__dirname)
+				.pipe(res)
 		}
 
 		if (typeof delay === 'number') {
