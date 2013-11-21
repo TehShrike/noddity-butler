@@ -71,20 +71,26 @@ function PostManager(retrieval, levelUpDb) {
 		getLocalPosts: function getLocalPosts(arrayOFileNames, cb) {
 			var foundPosts = []
 			var checked = 0
+			var srsError = false
 			arrayOFileNames.forEach(function(filename) {
 				getLocalPost(filename, function(err, post) {
-					checked++
-					if (!err) {
-						foundPosts.push(post)
-					}
+					if (!srsError) {
+						checked++
+						if (!err) {
+							foundPosts.push(post)
+						} else if (!err.notFound) {
+							srsError = err
+							cb(srsError)
+						}
 
-					if (checked === arrayOFileNames.length) {
-						cb(foundPosts)
+						if (checked === arrayOFileNames.length) {
+							cb(false, foundPosts)
+						}
 					}
 				})
 			})
 			if (arrayOFileNames.length === 0) {
-				cb(foundPosts)
+				cb(false, foundPosts)
 			}
 		}
 	}
@@ -124,7 +130,7 @@ function PostIndexManager(retrieval, postManager, levelUpDb) {
 		}
 	})
 
-	function sortPosts
+	function getPosts
 
 	function allPostsAreLoaded() {
 		return typeof postNames === 'array' && postNames && postNames.length === postManager.getPostsByDate().length
