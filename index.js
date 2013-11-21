@@ -1,13 +1,11 @@
 var NoddityRetrieval = require('noddity-retrieval')
 var StringMap = require('stringmap')
-var kind = require('kind')
-var sorted = require('sorted')
 
 var MemDOWN = require('memdown')
 var levelup = require('levelup')
 var sublevel = require('level-sublevel')
 
-var postComparator = function(a, b) {
+function postComparator(a, b) {
 	if (a.metadata.date == b.metadata.date) {
 		return 0
 	} else if (a.metadata.date < b.metadata.date) {
@@ -17,44 +15,42 @@ var postComparator = function(a, b) {
 	}
 }
 
-var PostManager = function(retrieval, levelUpDb) {
-	var postsByDate = sorted([], postComparator)
-
-	// TODO: grab all posts in the levelUpDb on instantiation
-
+function PostManager(retrieval, levelUpDb) {
 	function getRemotePost(filename, cb) {
 		retrieval.getPost(filename, function(err, post) {
 			if (!err) {
-				postsByDate.push(post)
 				levelUpDb.put(filename, JSON.stringify(post))
 			}
 			cb(err, post)
 		})
 	}
 
-	var getPost = function(filename, cb) {
+	function getLocalPost(filename, cb) {
 		levelUpDb.get(filename, function(err, post) {
+			cb(err, err || JSON.parse(post))
+		})
+	}
+
+	function getPost(filename, cb) {
+		getLocalPost(filename, function(err, post) {
 			if (err && err.notFound) {
 				getRemotePost(filename, cb)
 			} else if (err) {
 				cb(err)
 			} else {
-				cb(false, JSON.parse(post))
+				cb(false, post)
 			}
 		})
 	}
 
 	return {
 		getPost: getPost,
-		getPostsByDate: function(begin, end) {
-			return (kind(begin) === 'Number' ? postsByDate.slice(begin, end) : postsByDate).toArray()
-		},
-		getPosts: function(arrayOFileNames, cb) {
+		getPosts: function getPosts(arrayOFileNames, cb) {
 			var returned = 0
 			var results = []
 			var error = false
-			arrayOFileNames.forEach(function(fileName, index) {
-				getPost(fileName, function(err, post) {
+			arrayOFileNames.forEach(function(filename, index) {
+				getPost(filename, function(err, post) {
 					if (!error && err) {
 						error = true
 						cb(err)
@@ -68,16 +64,36 @@ var PostManager = function(retrieval, levelUpDb) {
 					}
 				})
 			})
+			if(arrayOFileNames.length === 0) {
+				cb(false, results)
+			}
+		},
+		getLocalPosts: function getLocalPosts(arrayOFileNames, cb) {
+			var foundPosts = []
+			var checked = 0
+			arrayOFileNames.forEach(function(filename) {
+				getLocalPost(filename, function(err, post) {
+					checked++
+					if (!err) {
+						foundPosts.push(post)
+					}
+
+					if (checked === arrayOFileNames.length) {
+						cb(foundPosts)
+					}
+				})
+			})
+			if (arrayOFileNames.length === 0) {
+				cb(foundPosts)
+			}
 		}
 	}
 }
 
-var PostIndexManager = function(retrieval, postManager, levelUpDb) {
+function PostIndexManager(retrieval, postManager, levelUpDb) {
 	var indexRetrievalError = false
 	var postNames = null
 	var callbacksWhenPostNamesArrive = []
-
-	// TODO: grab the index from levelUpDb on instantiation
 
 	function indexRetrievalIsFinished(err, postNames) {
 		callbacksWhenPostNamesArrive.forEach(function(cb) {
@@ -93,7 +109,7 @@ var PostIndexManager = function(retrieval, postManager, levelUpDb) {
 				levelUpDb.put('index', JSON.stringify(ary))
 				postNames = ary
 			}
-			if (kind(cb) === 'Function') {
+			if (typeof cb === 'function') {
 				cb(err, ary)
 			}
 		})
@@ -108,12 +124,14 @@ var PostIndexManager = function(retrieval, postManager, levelUpDb) {
 		}
 	})
 
-	var allPostsAreLoaded = function() {
-		return kind(postNames) === 'Array' && postNames && postNames.length === postManager.getPostsByDate().length
+	function sortPosts
+
+	function allPostsAreLoaded() {
+		return typeof postNames === 'array' && postNames && postNames.length === postManager.getPostsByDate().length
 	}
 
-	var getPosts = function(begin, end, cb) {
-		if (kind(begin) === 'Function') {
+	function getPosts(begin, end, cb) {
+		if (typeof begin === 'function') {
 			cb = begin
 		}
 
@@ -122,7 +140,7 @@ var PostIndexManager = function(retrieval, postManager, levelUpDb) {
 			cb(false, postManager.getPostsByDate(begin, end))
 		} else {
 			var relevantPostNames = postNames
-			if (kind(begin) === 'Number') {
+			if (typeof begin === 'number') {
 				relevantPostNames = postNames.slice(begin, end)
 			}
 			postManager.getPosts(relevantPostNames, function(err, posts) {
@@ -142,7 +160,7 @@ var PostIndexManager = function(retrieval, postManager, levelUpDb) {
 			// Assume that the last argument is the final callback, and just call it
 			var cb = args.length > 0 ? args[args.length - 1] : fn
 			cb.call(this, indexRetrievalError)
-		} else if (kind(postNames) === 'Null') {
+		} else if (postNames === null) {
 			callbacksWhenPostNamesArrive.push(function() {
 				fn.apply(this, args)
 			})
@@ -152,20 +170,19 @@ var PostIndexManager = function(retrieval, postManager, levelUpDb) {
 	}
 
 	function fetchAllPosts(cb) {
-		runWhenIndexArrives(function(err) {
-			if (err) {
-				cb(err)
-			} else {
-				postManager.getPosts(postNames, cb)
+		postManager.getPosts(postNames, function(err, posts) {
+			if (!err) {
+
 			}
+			cb(err, posts)
 		})
 	}
 
 	return {
-		getPosts: function(begin, end, cb) {
+		getPosts: function getPosts(begin, end, cb) {
 			runWhenIndexArrives(getPosts, begin, end, cb)
 		},
-		fetchAllPosts: function(cb) {
+		fetchAllPosts: function fetchAllPosts(cb) {
 			runWhenIndexArrives(fetchAllPosts, cb)
 		},
 		allPostsAreLoaded: allPostsAreLoaded
@@ -183,13 +200,13 @@ module.exports = function NoddityButler(host, levelUpDb) {
 
 	return {
 		getPost: postManager.getPost,
-		getAllPosts: function(cb) {
+		getAllPosts: function getAllPosts(cb) {
 			indexManager.fetchAllPosts(cb)
 		},
-		getRecentPosts: function(count, cb) {
+		getRecentPosts: function getRecentPosts(count, cb) {
 			indexManager.getPosts(-count, undefined, cb)
 		},
-		getOldestPosts: function(count, cb) {
+		getOldestPosts: function getOldestPosts(count, cb) {
 			indexManager.getPosts(0, count, cb)
 		},
 		allPostsAreLoaded: indexManager.allPostsAreLoaded
