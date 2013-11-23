@@ -1,19 +1,8 @@
 var NoddityRetrieval = require('noddity-retrieval')
-var StringMap = require('stringmap')
-
+var ASQ = require('asynquence')
 var MemDOWN = require('memdown')
 var levelup = require('levelup')
 var sublevel = require('level-sublevel')
-
-function postComparator(a, b) {
-	if (a.metadata.date == b.metadata.date) {
-		return 0
-	} else if (a.metadata.date < b.metadata.date) {
-		return -1
-	} else {
-		return 1
-	}
-}
 
 function PostManager(retrieval, levelUpDb) {
 	function getRemotePost(filename, cb) {
@@ -46,53 +35,66 @@ function PostManager(retrieval, levelUpDb) {
 	return {
 		getPost: getPost,
 		getPosts: function getPosts(arrayOFileNames, cb) {
-			var returned = 0
 			var results = []
 			var error = false
-			arrayOFileNames.forEach(function(filename, index) {
-				getPost(filename, function(err, post) {
-					if (!error && err) {
-						error = true
-						cb(err)
-					} else if (!error) {
-						results[index] = post
 
-						returned++
-						if (returned === arrayOFileNames.length) {
-							cb(false, results)
+			var sequence = ASQ()
+
+			var fns = arrayOFileNames.map(function(filename, index) {
+				return function(done) {
+					getPost(filename, function(err, post) {
+						if (!error && err) {
+							sequence.abort()
+							error = err
+						} else if (!error) {
+							results[index] = post
+
+							done()
 						}
-					}
-				})
+					})
+				}
 			})
-			if(arrayOFileNames.length === 0) {
-				cb(false, results)
-			}
+
+			sequence.gate.apply(this, fns).then(function() {
+				cb(error, results)
+			})
 		},
 		getLocalPosts: function getLocalPosts(arrayOFileNames, cb) {
 			var foundPosts = []
-			var checked = 0
 			var srsError = false
-			arrayOFileNames.forEach(function(filename) {
-				getLocalPost(filename, function(err, post) {
-					if (!srsError) {
-						checked++
-						if (!err) {
-							foundPosts.push(post)
-						} else if (!err.notFound) {
-							srsError = err
-							cb(srsError)
-						}
 
-						if (checked === arrayOFileNames.length) {
-							cb(false, foundPosts)
+			var sequence = ASQ()
+
+			var fns = arrayOFileNames.map(function(filename) {
+				return function(done) {
+					getLocalPost(filename, function(err, post) {
+						if (!srsError) {
+							if (!err) {
+								foundPosts.push(post)
+							} else if (!err.notFound) {
+								srsError = err
+								sequence.abort()
+							}
 						}
-					}
-				})
+						done()
+					})
+				}
 			})
-			if (arrayOFileNames.length === 0) {
-				cb(false, foundPosts)
-			}
+
+			sequence.gate.apply(this, fns).then(function() {
+				cb(srsError, foundPosts)
+			})
 		}
+	}
+}
+
+function postComparator(a, b) {
+	if (a.metadata.date == b.metadata.date) {
+		return 0
+	} else if (a.metadata.date < b.metadata.date) {
+		return -1
+	} else {
+		return 1
 	}
 }
 
@@ -130,33 +132,31 @@ function PostIndexManager(retrieval, postManager, levelUpDb) {
 		}
 	})
 
-	function getPosts
-
-	function allPostsAreLoaded() {
-		return typeof postNames === 'array' && postNames && postNames.length === postManager.getPostsByDate().length
-	}
-
-	function getPosts(begin, end, cb) {
+	function getPosts(begin, end, cb, postGetter) {
 		if (typeof begin === 'function') {
 			cb = begin
 		}
 
-		if (allPostsAreLoaded()) {
-			// Return the appropriate posts, sorted by date
-			cb(false, postManager.getPostsByDate(begin, end))
-		} else {
-			var relevantPostNames = postNames
-			if (typeof begin === 'number') {
-				relevantPostNames = postNames.slice(begin, end)
-			}
-			postManager.getPosts(relevantPostNames, function(err, posts) {
-				if (err) {
-					cb(err)
-				} else {
-					cb(false, posts.sort(postComparator))
+		postGetter(postNames, function(err, posts) {
+			if (err) {
+				cb(err)
+			} else {
+				posts = posts.sort(postComparator)
+				if (typeof begin === 'number') {
+					posts = posts.slice(begin, end)
 				}
-			})
-		}
+
+				cb(false, posts)
+			}
+		})
+	}
+
+	function getAllPosts(begin, end, cb) {
+		getPosts(begin, end, cb, postManager.getPosts)
+	}
+
+	function getLocalPosts(begin, end, cb) {
+		getPosts(begin, end, cb, postManager.getLocalPosts)
 	}
 
 	function runWhenIndexArrives() {
@@ -175,23 +175,18 @@ function PostIndexManager(retrieval, postManager, levelUpDb) {
 		}
 	}
 
-	function fetchAllPosts(cb) {
-		postManager.getPosts(postNames, function(err, posts) {
-			if (!err) {
-
-			}
-			cb(err, posts)
-		})
-	}
-
 	return {
 		getPosts: function getPosts(begin, end, cb) {
-			runWhenIndexArrives(getPosts, begin, end, cb)
+			runWhenIndexArrives(getAllPosts, begin, end, cb)
 		},
-		fetchAllPosts: function fetchAllPosts(cb) {
-			runWhenIndexArrives(fetchAllPosts, cb)
+		getLocalPosts: function getLocalPosts(begin, end, cb) {
+			runWhenIndexArrives(getLocalPosts, begin, end, cb)
 		},
-		allPostsAreLoaded: allPostsAreLoaded
+		allPostsAreLoaded: function allPostsAreLoaded(cb) {
+			runWhenIndexArrives(getLocalPosts, function(err, posts) {
+				cb(err, err || posts.length === postNames.length)
+			})
+		}
 	}
 }
 
@@ -204,17 +199,15 @@ module.exports = function NoddityButler(host, levelUpDb) {
 	var postManager = new PostManager(retrieval, db.sublevel('posts'))
 	var indexManager = new PostIndexManager(retrieval, postManager, db.sublevel('index'))
 
+	function getPosts(options, cb) {
+		var local = options.local || false
+		var begin = typeof options.mostRecent === 'number' ? -options.mostRecent : undefined
+		(local ? indexManager.getLocalPosts : indexManager.getPosts)(begin, undefined, cb)
+	}
+
 	return {
 		getPost: postManager.getPost,
-		getAllPosts: function getAllPosts(cb) {
-			indexManager.fetchAllPosts(cb)
-		},
-		getRecentPosts: function getRecentPosts(count, cb) {
-			indexManager.getPosts(-count, undefined, cb)
-		},
-		getOldestPosts: function getOldestPosts(count, cb) {
-			indexManager.getPosts(0, count, cb)
-		},
+		getPosts: getPosts,
 		allPostsAreLoaded: indexManager.allPostsAreLoaded
 	}
 }
