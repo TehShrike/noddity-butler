@@ -1,22 +1,29 @@
 var Butler = require('../')
 var test = require('tap').test
-var kind = require('kind')
 var createServer = require('./fakeo_remote_server/index.js')
+var ASQ = require('asynquence')
 
 test("no server running", function(t) {
 	var butler = new Butler('http://127.0.0.1:8989')
 
-	butler.getAllPosts(function(err, posts) {
-		t.ok(err, "error getting all posts")
-
-		butler.getRecentPosts(3, function(err, posts) {
+	ASQ(function(done) {
+		butler.getPosts(function(err, posts) {
+			t.ok(err, "error getting all posts")
+			done()
+		})
+	}).then(function(done) {
+		butler.getPosts({ mostRecent: 3 }, function(err, posts) {
 			t.ok(err, "error getting most recent posts")
 
-			butler.getOldestPosts(3, function(err, posts) {
-				t.ok(err, "error getting oldest posts")
-				t.end()
-			})
+			done()
 		})
+	}).then(function(done) {
+		butler.getPosts({ local: true }, function(err, posts) {
+			t.ok(err, "error getting local posts")
+			done()
+		})
+	}).then(function() {
+		t.end()
 	})
 })
 

@@ -55,7 +55,7 @@ function PostManager(retrieval, levelUpDb) {
 				}
 			})
 
-			sequence.gate.apply(this, fns).then(function() {
+			sequence.gate.apply(sequence, fns).then(function() {
 				cb(error, results)
 			})
 		},
@@ -81,8 +81,9 @@ function PostManager(retrieval, levelUpDb) {
 				}
 			})
 
-			sequence.gate.apply(this, fns).then(function() {
+			sequence.gate.apply(sequence, fns).then(function(done) {
 				cb(srsError, foundPosts)
+				done()
 			})
 		}
 	}
@@ -162,13 +163,19 @@ function PostIndexManager(retrieval, postManager, levelUpDb) {
 	function runWhenIndexArrives() {
 		var args = Array.prototype.slice.call(arguments)
 		var fn = args.shift()
+
+		// Assume that the last argument is the final callback
+		var cb = args.length > 0 ? args[args.length - 1] : fn
+
 		if (indexRetrievalError) {
-			// Assume that the last argument is the final callback, and just call it
-			var cb = args.length > 0 ? args[args.length - 1] : fn
 			cb.call(this, indexRetrievalError)
 		} else if (postNames === null) {
-			callbacksWhenPostNamesArrive.push(function() {
-				fn.apply(this, args)
+			callbacksWhenPostNamesArrive.push(function(err, posts) {
+				if (err) {
+					cb(err)
+				} else {
+					fn.apply(this, args)
+				}
 			})
 		} else {
 			fn.apply(this, args)
@@ -176,15 +183,15 @@ function PostIndexManager(retrieval, postManager, levelUpDb) {
 	}
 
 	return {
-		getPosts: function getPosts(begin, end, cb) {
+		getPosts: function(begin, end, cb) {
 			runWhenIndexArrives(getAllPosts, begin, end, cb)
 		},
-		getLocalPosts: function getLocalPosts(begin, end, cb) {
+		getLocalPosts: function(begin, end, cb) {
 			runWhenIndexArrives(getLocalPosts, begin, end, cb)
 		},
-		allPostsAreLoaded: function allPostsAreLoaded(cb) {
+		allPostsAreLoaded: function(cb) {
 			runWhenIndexArrives(getLocalPosts, function(err, posts) {
-				cb(err, err || posts.length === postNames.length)
+				cb(err, err || (posts.length === postNames.length))
 			})
 		}
 	}
@@ -200,9 +207,18 @@ module.exports = function NoddityButler(host, levelUpDb) {
 	var indexManager = new PostIndexManager(retrieval, postManager, db.sublevel('index'))
 
 	function getPosts(options, cb) {
+		if (typeof options === 'function') {
+			cb = options
+		}
+		if (typeof options !== 'object') {
+			options = {}
+		}
 		var local = options.local || false
 		var begin = typeof options.mostRecent === 'number' ? -options.mostRecent : undefined
-		(local ? indexManager.getLocalPosts : indexManager.getPosts)(begin, undefined, cb)
+
+		var postGetter = local ? indexManager.getLocalPosts : indexManager.getPosts
+
+		postGetter(begin, undefined, cb)
 	}
 
 	return {
