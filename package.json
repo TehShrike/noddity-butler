@@ -23,8 +23,11 @@
     "send": "~0.1.4"
   },
   "dependencies": {
-    "stringmap": "~0.2.2",
     "noddity-retrieval": "1.0.0",
-    "sorted": "0.0.0"
+    "sorted": "0.0.0",
+    "levelup": "~0.18.0",
+    "level-sublevel": "~5.1.1",
+    "memdown": "~0.5.1",
+    "asynquence": "~0.1.1-a"
   }
 }
