@@ -2,11 +2,11 @@ var Butler = require('../')
 var test = require('tap').test
 var createServer = require('./fakeo_remote_server/index.js')
 var ASQ = require('asynquence')
-
+var levelmem = require('level-mem')
 
 test('After all the posts are loaded, getMostRecent should return the most recent ordered by post date', function(t) {
 	var server = createServer(8989, 100)
-	var butler = new Butler('http://127.0.0.1:8989')
+	var butler = new Butler('http://127.0.0.1:8989', levelmem())
 
 	butler.allPostsAreLoaded(function(err, loaded) {
 		t.notOk(err, "no error checking that all posts were loaded")
@@ -27,6 +27,7 @@ test('After all the posts are loaded, getMostRecent should return the most recen
 					t.equal(posts[0].metadata.title, 'This is the third post', "third most recent post matches")
 					t.equal(posts[1].metadata.title, 'This is the fifth post', "second most recent post matches")
 					t.equal(posts[2].metadata.title, 'This is the fourth post', "most recent post matches")
+					butler.stop()
 					server.close()
 					t.end()
 				})
@@ -37,7 +38,7 @@ test('After all the posts are loaded, getMostRecent should return the most recen
 
 test('Getting local posts should return the available posts, ordered by date', function(t) {
 	var server = createServer(8989, 100)
-	var butler = new Butler('http://127.0.0.1:8989')
+	var butler = new Butler('http://127.0.0.1:8989', levelmem())
 
 	ASQ().gate(
 		function(done) {
@@ -66,6 +67,7 @@ test('Getting local posts should return the available posts, ordered by date', f
 			done()
 		})
 	}).then(function(done) {
+		butler.stop()
 		server.close()
 		t.end()
 		done()
@@ -75,7 +77,7 @@ test('Getting local posts should return the available posts, ordered by date', f
 
 test('After grabbing all posts, we can ask for the 3 most recent and get the correct posts', function(t) {
 	var server = createServer(8989, 100)
-	var butler = new Butler('http://127.0.0.1:8989')
+	var butler = new Butler('http://127.0.0.1:8989', levelmem())
 
 	ASQ(function(done) {
 		butler.getPosts(function(err, posts) {
@@ -96,6 +98,7 @@ test('After grabbing all posts, we can ask for the 3 most recent and get the cor
 			done()
 		})
 	}).then(function() {
+		butler.stop()
 		server.close()
 		t.end()
 	})

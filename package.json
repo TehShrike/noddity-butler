@@ -1,33 +1,37 @@
 {
-  "name": "noddity-butler",
-  "version": "0.0.2",
-  "main": "./index.js",
-  "author": {
-    "name": "TehShrike",
-    "email": "me@JoshDuff.com",
-    "url": "http://joshduff.com"
-  },
-  "description": "Retrieve remote blog files, arrange them appropriately, and present them to the master of the house",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/TehShrike/noddity-butler.git"
-  },
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "tap ./test/*.js"
-  },
-  "devDependencies": {
-    "tap": "~0.4.4",
-    "send": "~0.1.4"
-  },
-  "dependencies": {
-    "noddity-retrieval": "1.0.0",
-    "sorted": "0.0.0",
-    "levelup": "~0.18.0",
-    "level-sublevel": "~5.1.1",
-    "memdown": "~0.5.1",
-    "asynquence": "~0.1.1-a"
-  }
+	"name": "noddity-butler",
+	"version": "0.0.2",
+	"main": "./index.js",
+	"author": {
+		"name": "TehShrike",
+		"email": "me@JoshDuff.com",
+		"url": "http://joshduff.com"
+	},
+	"description": "Retrieve remote blog files, arrange them appropriately, and present them to the master of the house",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/TehShrike/noddity-butler.git"
+	},
+	"directories": {
+		"test": "test"
+	},
+	"scripts": {
+		"test": "tap ./test/*.js"
+	},
+	"devDependencies": {
+		"tap": "~0.4.4",
+		"send": "~0.1.4",
+		"level-mem": "~0.18.0"
+	},
+	"dependencies": {
+		"noddity-retrieval": "~1.0.1",
+		"sorted": "~0.0.0",
+		"level-sublevel": "~5.2.0",
+		"asynquence": "~0.1.1-a",
+		"levelup-cache": "~1.0.0"
+	},
+	"peerDependencies": {
+		"level-sublevel": ">=5.2.0",
+		"levelup": "~0.18.0"
+	}
 }

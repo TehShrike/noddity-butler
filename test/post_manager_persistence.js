@@ -3,11 +3,10 @@ var PostManager = require('../lib/post_manager.js')
 var TestRetrieval = require('./retrieval/stub.js')
 
 var ASQ = require('asynquence')
-var levelup = require('levelup')
-var MemDOWN = require('memdown')
+var levelmem = require('level-mem')
 
 test('get single local posts without hitting the server', function(t) {
-	var db = levelup('/does/not/matter', { db: MemDOWN })
+	var db = levelmem('no location', {valueEncoding: 'json'})
 
 	ASQ(function(done) {
 		var retrieval = new TestRetrieval()
@@ -18,6 +17,7 @@ test('get single local posts without hitting the server', function(t) {
 		postManager.getPost('post1.lol', function(err, post) {
 			t.notOk(err, "no error")
 			t.equal(post.metadata.title, 'post one')
+			postManager.stop()
 			done()
 		})
 	}).then(function(done) {
@@ -28,6 +28,7 @@ test('get single local posts without hitting the server', function(t) {
 		postManager.getPost('post1.lol', function(err, post) {
 			t.notOk(err, "no error")
 			t.equal(post.metadata.title, 'post one')
+			postManager.stop()
 			done()
 		})
 	}).then(function() {

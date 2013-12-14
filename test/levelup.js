@@ -3,41 +3,34 @@ var test = require('tap').test
 var createServer = require('./fakeo_remote_server/index.js')
 
 var ASQ = require('asynquence')
-var levelup = require('levelup')
-var MemDOWN = require('memdown')
+var levelmem = require('level-mem')
 
 test('get all posts', function(t) {
 	var server = createServer(8989)
-	var db = levelup('/does/not/matter', { db: MemDOWN })
+	var db = levelmem()
 
 	var butlerOne = new Butler('http://127.0.0.1:8989', db)
 
 	butlerOne.getPosts(function(err, posts) {
 		t.notOk(err, "no errors")
-		if (err) {
-			console.log(err.message)
-		} else {
-			t.equal(posts.length, 6, "six posts returned")
+		t.equal(posts.length, 6, "six posts returned")
 
-			posts.forEach(function(post) {
-				t.equal(typeof post.metadata.title, "string", "Post has a title, and it's a string")
-			})
-		}
+		posts.forEach(function(post) {
+			t.ok(post && post.metadata && typeof post.metadata.title === "string", "Post has a title, and it's a string")
+		})
+		butlerOne.stop()
 		server.close()
 
 		// Server be shut down at this point
 		var butlerTwo = new Butler('http://127.0.0.1:8989', db)
-			butlerTwo.getPosts(function(err, posts) {
+		butlerTwo.getPosts(function(err, posts) {
 			t.notOk(err, "no errors")
-			if (err) {
-				console.log(err.message)
-			} else {
-				t.equal(posts.length, 6, "six posts returned")
+			butlerTwo.stop()
+			t.equal(posts.length, 6, "six posts returned")
 
-				posts.forEach(function(post) {
-					t.equal(typeof post.metadata.title, "string", "Post has a title, and it's a string")
-				})
-			}
+			posts.forEach(function(post) {
+				t.ok(post && post.metadata && typeof post.metadata.title === "string", "Post has a title, and it's a string")
+			})
 			t.end()
 		})
 	})

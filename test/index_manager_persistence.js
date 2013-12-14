@@ -4,18 +4,17 @@ var IndexManager = require('../lib/index_manager.js')
 var TestRetrieval = require('./retrieval/stub.js')
 
 var ASQ = require('asynquence')
-var levelup = require('levelup')
-var MemDOWN = require('memdown')
+var levelmem = require('level-mem')
 
 test("Loading the index from levelUP instead of the retrieval object", function(t) {
-	var indexDb = levelup('/does/not/matter', { db: MemDOWN })
+	var indexDb = levelmem()
 
 
 	ASQ(function(done) {
 		var retrieval = new TestRetrieval()
 		retrieval.addPost('post1.lol', 'post one', new Date(), 'whatever')
 
-		var postManager = new PostManager(retrieval, levelup('temporary', { db: MemDOWN }))
+		var postManager = new PostManager(retrieval, levelmem('no location', {valueEncoding: 'json'}))
 		var indexManager = new IndexManager(retrieval, postManager, indexDb)
 
 		indexManager.getPosts(function(err, posts) {
@@ -23,12 +22,14 @@ test("Loading the index from levelUP instead of the retrieval object", function(
 			t.equal(posts.length, 1, "1 post found")
 			t.equal(posts[0].metadata.title, "post one", "The post returned was the correct one")
 
+			postManager.stop()
+
 			done()
 		})
 	}).then(function(done) {
 		var retrieval = new TestRetrieval()
 		retrieval.addPost('post2.wat', 'a different post', new Date(), 'whatever')
-		var postManager = new PostManager(retrieval, levelup('temporary', { db: MemDOWN }))
+		var postManager = new PostManager(retrieval, levelmem('no location', {valueEncoding: 'json'}))
 
 		var indexManager = new IndexManager({}, postManager, indexDb)
 
@@ -40,6 +41,7 @@ test("Loading the index from levelUP instead of the retrieval object", function(
 				t.notOk(err, "no error")
 				t.equal(posts.length, 1, "1 post found")
 				t.equal(posts[0].metadata.title, "oh hey", "The post returned was the correct one")
+				postManager.stop()
 				done()
 			})
 		})
