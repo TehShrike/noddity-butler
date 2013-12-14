@@ -10,7 +10,7 @@ module.exports = function NoddityButler(host, levelUpDb) {
 	var db = sublevel(levelUpDb)
 
 	var postManager = new PostManager(retrieval, db.sublevel('posts', {valueEncoding: 'json'}))
-	var indexManager = new PostIndexManager(retrieval, postManager, db.sublevel('index'))
+	var indexManager = new PostIndexManager(retrieval, postManager, db.sublevel('index', {valueEncoding: 'json'}))
 
 	function getPosts(options, cb) {
 		if (typeof options === 'function') {
@@ -27,6 +27,7 @@ module.exports = function NoddityButler(host, levelUpDb) {
 
 	function stop() {
 		postManager.stop()
+		indexManager.stop()
 	}
 
 	return {

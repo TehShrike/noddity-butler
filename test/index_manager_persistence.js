@@ -7,7 +7,7 @@ var ASQ = require('asynquence')
 var levelmem = require('level-mem')
 
 test("Loading the index from levelUP instead of the retrieval object", function(t) {
-	var indexDb = levelmem()
+	var indexDb = levelmem('no location', {valueEncoding: 'json'})
 
 
 	ASQ(function(done) {
@@ -23,6 +23,7 @@ test("Loading the index from levelUP instead of the retrieval object", function(
 			t.equal(posts[0].metadata.title, "post one", "The post returned was the correct one")
 
 			postManager.stop()
+			indexManager.stop()
 
 			done()
 		})
@@ -42,6 +43,7 @@ test("Loading the index from levelUP instead of the retrieval object", function(
 				t.equal(posts.length, 1, "1 post found")
 				t.equal(posts[0].metadata.title, "oh hey", "The post returned was the correct one")
 				postManager.stop()
+				indexManager.stop()
 				done()
 			})
 		})
