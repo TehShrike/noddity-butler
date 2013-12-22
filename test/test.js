@@ -2,6 +2,7 @@ var Butler = require('../')
 var test = require('tap').test
 var createServer = require('./fakeo_remote_server/index.js')
 var levelmem = require('level-mem')
+var isDate = require('util').isDate
 
 test('get all posts', function(t) {
 	var server = createServer(8989)
@@ -16,6 +17,7 @@ test('get all posts', function(t) {
 
 			posts.forEach(function(post) {
 				t.equal(typeof post.metadata.title, "string", "Post has a title, and it's a string")
+				t.ok(isDate(post.metadata.date), "Post has a date property of type date")
 			})
 		}
 		butler.stop()

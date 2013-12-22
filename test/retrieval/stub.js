@@ -29,11 +29,16 @@ function TestRetrieval() {
 		cb(false, index)
 	}
 	this.getPost = function getPost(name, cb) {
-		if (typeof posts[name] === 'undefined') {
-			cb("There's nothing there named " + name + ", idiot")
-		} else {
-			cb(false, posts[name])
-		}
+		process.nextTick(function() {
+			if (typeof posts[name] === 'undefined') {
+				cb("There's nothing there named " + name + ", idiot")
+			} else {
+				cb(false, posts[name])
+			}
+		})
+	}
+	this.getPostSync = function(name) {
+		return posts[name]
 	}
 }
 

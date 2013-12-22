@@ -30,7 +30,7 @@ test("Loading the index from levelUP instead of the retrieval object", function(
 	}).then(function(done) {
 		var retrieval = new TestRetrieval()
 		retrieval.addPost('post2.wat', 'a different post', new Date(), 'whatever')
-		var postManager = new PostManager(retrieval, levelmem('no location', {valueEncoding: 'json'}))
+		var postManager = new PostManager(retrieval, levelmem('no location', { valueEncoding: require('./retrieval/encoding.js') }))
 
 		var indexManager = new IndexManager({}, postManager, indexDb)
 
