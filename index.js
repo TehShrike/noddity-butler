@@ -7,8 +7,10 @@ var PostManager = require('./lib/post_manager.js')
 
 var postCaster = new Wizard({
 	postMetadata: 'metadata',
+	string: ['content', 'filename'],
 	default: {
-		content: ''
+		content: '',
+		filename: ''
 	},
 	cast: {
 		postMetadata: new Wizard({
