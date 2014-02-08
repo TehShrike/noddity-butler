@@ -1,3 +1,4 @@
+var EventEmitter = require('events').EventEmitter
 var sublevel = require('level-sublevel')
 var Wizard = require('weak-type-wizard')
 var NoddityRetrieval = require('noddity-retrieval')
@@ -23,7 +24,11 @@ module.exports = function NoddityButler(host, levelUpDb) {
 	var retrieval = new NoddityRetrieval(host)
 	var db = sublevel(levelUpDb)
 
-	var postManager = new PostManager(retrieval, db.sublevel('posts', { valueEncoding: postCaster.getLevelUpEncoding() }))
+	var emitter = new EventEmitter()
+	var postManager = new PostManager(retrieval, db.sublevel('posts', {
+		emitter: emitter,
+		valueEncoding: postCaster.getLevelUpEncoding()
+	}))
 	var indexManager = new PostIndexManager(retrieval, postManager, db.sublevel('index', { valueEncoding: 'json' }))
 
 	function getPosts(options, cb) {
@@ -44,10 +49,10 @@ module.exports = function NoddityButler(host, levelUpDb) {
 		indexManager.stop()
 	}
 
-	return {
-		getPost: postManager.getPost,
-		getPosts: getPosts,
-		allPostsAreLoaded: indexManager.allPostsAreLoaded,
-		stop: stop
-	}
+	emitter.getPost = postManager.getPost
+	emitter.getPosts = getPosts
+	emitter.allPostsAreLoaded = indexManager.allPostsAreLoaded
+	emitter.stop = stop
+
+	return emitter
 }
