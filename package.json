@@ -1,6 +1,6 @@
 {
 	"name": "noddity-butler",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"main": "./index.js",
 	"author": {
 		"name": "TehShrike",
@@ -24,7 +24,7 @@
 		"level-mem": "~0.18.0"
 	},
 	"dependencies": {
-		"noddity-retrieval": "^2.0.0",
+		"noddity-retrieval": "^1.1.0",
 		"sorted": "~0.0.0",
 		"level-sublevel": "~5.2.0",
 		"asynquence": "~0.1.1-a",
