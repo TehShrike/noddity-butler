@@ -1,39 +1,39 @@
 {
-	"name": "noddity-butler",
-	"version": "1.0.2",
-	"main": "./index.js",
-	"author": {
-		"name": "TehShrike",
-		"email": "me@JoshDuff.com",
-		"url": "http://joshduff.com"
-	},
-	"description": "Retrieve remote blog files, arrange them appropriately, and present them to the master of the house",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/TehShrike/noddity-butler.git"
-	},
-	"directories": {
-		"test": "test"
-	},
-	"scripts": {
-		"test": "tap ./test/*.js"
-	},
-	"devDependencies": {
-		"tap": "~0.4.4",
-		"send": "~0.1.4",
-		"level-mem": "~0.18.0"
-	},
-	"dependencies": {
-		"noddity-retrieval": "^1.1.0",
-		"sorted": "~0.0.0",
-		"level-sublevel": "~5.2.0",
-		"asynquence": "~0.1.1-a",
-		"levelup-cache": "~1.1.2",
-		"weak-type-wizard": "~1.1.0",
-		"extend": "~1.2.1"
-	},
-	"peerDependencies": {
-		"level-sublevel": ">=5.2.0",
-		"levelup": "~0.18.0"
-	}
+  "name": "noddity-butler",
+  "version": "1.1.0",
+  "main": "./index.js",
+  "author": {
+    "name": "TehShrike",
+    "email": "me@JoshDuff.com",
+    "url": "http://joshduff.com"
+  },
+  "description": "Retrieve remote blog files, arrange them appropriately, and present them to the master of the house",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TehShrike/noddity-butler.git"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap ./test/*.js"
+  },
+  "devDependencies": {
+    "tap": "~0.4.4",
+    "send": "~0.1.4",
+    "level-mem": "~0.18.0"
+  },
+  "dependencies": {
+    "noddity-retrieval": "^1.1.0",
+    "sorted": "~0.0.0",
+    "level-sublevel": "~5.2.0",
+    "asynquence": "~0.1.1-a",
+    "levelup-cache": "~1.1.2",
+    "weak-type-wizard": "~1.1.0",
+    "extend": "~1.2.1"
+  },
+  "peerDependencies": {
+    "level-sublevel": ">=5.2.0",
+    "levelup": "~0.18.0"
+  }
 }

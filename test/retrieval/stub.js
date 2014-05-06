@@ -26,7 +26,7 @@ function TestRetrieval() {
 		posts[name] = newPost(title, date, content)
 	}
 	this.getIndex = function getIndex(cb) {
-		cb(false, index)
+		setTimeout(cb.bind(null, false, index), 10)
 	}
 	this.getPost = function getPost(name, cb) {
 		process.nextTick(function() {
