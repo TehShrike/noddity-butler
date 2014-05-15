@@ -1,6 +1,6 @@
 {
   "name": "noddity-butler",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "./index.js",
   "author": {
     "name": "TehShrike",
@@ -31,9 +31,5 @@
     "levelup-cache": "~1.1.2",
     "weak-type-wizard": "~1.1.0",
     "extend": "~1.2.1"
-  },
-  "peerDependencies": {
-    "level-sublevel": ">=5.2.0",
-    "levelup": "~0.18.0"
   }
 }
