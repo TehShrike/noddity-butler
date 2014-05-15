@@ -31,14 +31,19 @@ test("Butler emits events from the IndexManager", function(t) {
 		refreshEvery: 100
 	})
 
+	t.plan(4)
+
 	var occurrences = 0
 	butler.on('index changed', function(newIndex) {
 		occurrences++
 		t.equal(occurrences, 1, 'Change only emitted once')
 		t.equal(newIndex.length, 1, 'The index now has a thing in it')
 		t.equal(newIndex[0], 'heh', 'That new thing is "heh"')
-		butler.stop()
-		t.end()
+
+		butler.getPosts(function(err, posts) {
+			t.equal(posts.length, 1, 'An immediate call to getPosts in the index changed event handler returns the correct length')
+			butler.stop()
+		})
 	})
 
 	retrieval.addPost('heh', 'hurrrrrrr', new Date(), 'dur')

@@ -75,11 +75,16 @@ test("IndexManager emits events when the index changes", function(t) {
 	var postManager = getPostManager(retrieval)
 	var indexManager = getIndexManager(postManager, retrieval)
 
-	t.plan(4)
+	t.plan(6)
 
 	indexManager.once('change', function(index) {
 		t.equal(index.length, 1, 'One element in the index')
 		t.equal(index[0], 'somepost.md', 'The first element is the correct string')
+
+		indexManager.getPosts(function(err, posts) {
+			t.notOk(err)
+			t.equal(posts.length, 1, "Make sure that the posts list is updated when we fetch it from inside the event with getPosts")
+		})
 
 		indexManager.once('change', function(index) {
 			t.equal(index.length, 2, 'Two elements in the index')
