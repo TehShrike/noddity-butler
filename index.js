@@ -73,6 +73,7 @@ module.exports = function NoddityButler(host, levelUpDb, options) {
 	butler.getPosts = getPosts
 	butler.allPostsAreLoaded = indexManager.allPostsAreLoaded
 	butler.stop = stop
+	butler.refreshPost = postManager.refresh
 
 	return butler
 }
