@@ -36,13 +36,15 @@ module.exports = function NoddityButler(host, levelUpDb, options) {
 	var postManager = new PostManager(retrieval, db.sublevel('posts', {
 		valueEncoding: postCaster.getLevelUpEncoding()
 	}), {
-		refreshEvery: options.refreshEvery
+		refreshEvery: options.refreshEvery,
+		checkToSeeIfItemsNeedToBeRefreshedEvery: options.cacheCheckIntervalMs
 	})
 
 	var indexManager = new PostIndexManager(retrieval, postManager, db.sublevel('index', {
 		valueEncoding: 'json'
 	}), {
-		refreshEvery: options.refreshEvery
+		refreshEvery: options.refreshEvery,
+		checkToSeeIfItemsNeedToBeRefreshedEvery: options.cacheCheckIntervalMs
 	})
 
 	reflect('change', postManager, emitter, 'post changed')
