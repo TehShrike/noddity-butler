@@ -1,4 +1,4 @@
-var test = require('tap').test
+var test = require('tape')
 var PostManager = require('../lib/post_manager.js')
 var IndexManager = require('../lib/index_manager.js')
 var TestRetrieval = require('./retrieval/stub.js')

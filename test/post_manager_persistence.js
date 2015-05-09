@@ -1,4 +1,4 @@
-var test = require('tap').test
+var test = require('tape-catch')
 var PostManager = require('../lib/post_manager.js')
 var TestRetrieval = require('./retrieval/stub.js')
 
@@ -7,6 +7,8 @@ var levelmem = require('level-mem')
 
 test('get single local posts without hitting the server', function(t) {
 	var db = levelmem('derp test', { valueEncoding: require('./retrieval/encoding.js') })
+
+	t.timeoutAfter(15000)
 
 	var date = new Date()
 
@@ -19,7 +21,7 @@ test('get single local posts without hitting the server', function(t) {
 		postManager.getPost('post1.lol', function(err, post) {
 			t.notOk(err, "no error")
 			t.equal(post.metadata.title, 'post one')
-			t.similar(post.metadata.date, date, 'dates equal')
+			t.equal(post.metadata.date.getTime(), date.getTime(), 'dates equal')
 			postManager.stop()
 			done()
 		})
@@ -31,7 +33,7 @@ test('get single local posts without hitting the server', function(t) {
 		postManager.getPost('post1.lol', function(err, post) {
 			t.notOk(err, "no error")
 			t.equal(post.metadata.title, 'post one')
-			t.similar(post.metadata.date, date, 'dates equal')
+			t.equal(post.metadata.date.getTime(), date.getTime(), 'dates equal')
 			postManager.stop()
 			done()
 		})

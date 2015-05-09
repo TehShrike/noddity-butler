@@ -1,5 +1,5 @@
 var Butler = require('../')
-var test = require('tap').test
+var test = require('tape')
 var createServer = require('./fakeo_remote_server/index.js')
 var levelmem = require('level-mem')
 var isDate = require('util').isDate

@@ -1,4 +1,4 @@
-var test = require('tap').test
+var test = require('tape')
 var PostManager = require('../lib/post_manager.js')
 var IndexManager = require('../lib/index_manager.js')
 var TestRetrieval = require('./retrieval/stub.js')
@@ -32,6 +32,9 @@ test("PostManager emits when posts change", function(t) {
 	var post = retrieval.getPostSync('post1.lol')
 
 	var changes = 0
+
+	t.plan(12)
+	t.timeoutAfter(10000)
 
 	postManager.on('change', function(key, post) {
 		changes += 1
@@ -76,6 +79,7 @@ test("IndexManager emits events when the index changes", function(t) {
 	var indexManager = getIndexManager(postManager, retrieval)
 
 	t.plan(6)
+	t.timeoutAfter(10000)
 
 	indexManager.once('change', function(index) {
 		t.equal(index.length, 1, 'One element in the index')

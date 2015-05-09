@@ -1,4 +1,4 @@
-var test = require('tap').test
+var test = require('tape')
 var TestRetrieval = require('./retrieval/stub.js')
 var levelmem = require('level-mem')
 var Butler = require('../index.js')
@@ -11,6 +11,7 @@ test("Butler emits event from the PostManager when a new post is added", functio
 	})
 
 	t.plan(2)
+	t.timeoutAfter(5000)
 
 	butler.getPosts(function(err, posts) {
 		t.notOk(err, 'no error')

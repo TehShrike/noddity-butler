@@ -16,16 +16,16 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap ./test/*.js"
+    "test": "tape ./test/*.js"
   },
   "devDependencies": {
-    "tap": "~0.4.4",
+    "level-mem": "~0.18.0",
     "send": "~0.1.4",
-    "level-mem": "~0.18.0"
+    "tape": "^4.0.0",
+    "tape-catch": "^1.0.4"
   },
   "dependencies": {
     "noddity-retrieval": "^1.1.0",
-    "sorted": "~0.0.0",
     "level-sublevel": "~5.2.0",
     "asynquence": "~0.1.1-a",
     "levelup-cache": "~1.1.2",
