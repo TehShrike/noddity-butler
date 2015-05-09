@@ -48,7 +48,6 @@ module.exports = function NoddityButler(host, levelUpDb, options) {
 	})
 
 	reflect('change', postManager, emitter, 'post changed')
-	reflect('post added', postManager, emitter)
 	reflect('change', indexManager, emitter, 'index changed')
 
 	indexManager.on('change', indexManager.getPosts)
