@@ -1,5 +1,5 @@
 var EventEmitter = require('events').EventEmitter
-var sublevel = require('level-sublevel')
+var sub = require('subleveldown')
 var Wizard = require('weak-type-wizard')
 var NoddityRetrieval = require('noddity-retrieval')
 var extend = require('extend')
@@ -26,21 +26,20 @@ var postCaster = new Wizard({
 module.exports = function NoddityButler(host, levelUpDb, options) {
 	// Host can be either a noddity retrieval object/stub, or a host string to be passed in to one
 	var retrieval = typeof host === 'string' ? new NoddityRetrieval(host) : host
-	var db = sublevel(levelUpDb)
 	var emitter = new EventEmitter()
 	options = extend({}, options)
 
 	var butler = Object.create(emitter)
 
 
-	var postManager = new PostManager(retrieval, db.sublevel('posts', {
+	var postManager = new PostManager(retrieval, sub(levelUpDb, 'posts', {
 		valueEncoding: postCaster.getLevelUpEncoding()
 	}), {
 		refreshEvery: options.refreshEvery,
 		checkToSeeIfItemsNeedToBeRefreshedEvery: options.cacheCheckIntervalMs
 	})
 
-	var indexManager = new PostIndexManager(retrieval, postManager, db.sublevel('index', {
+	var indexManager = new PostIndexManager(retrieval, postManager, sub(levelUpDb, 'index', {
 		valueEncoding: 'json'
 	}), {
 		refreshEvery: options.refreshEvery,
