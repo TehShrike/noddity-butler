@@ -29,6 +29,7 @@
     "extend": "^2.0.0",
     "levelup-cache": "^2.0.0",
     "noddity-retrieval": "^1.1.0",
+    "run-parallel": "^1.1.2",
     "subleveldown": "^2.0.0",
     "weak-type-wizard": "^1.2.4"
   }
