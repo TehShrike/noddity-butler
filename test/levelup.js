@@ -2,7 +2,6 @@ var Butler = require('../')
 var test = require('tape')
 var createServer = require('./fakeo_remote_server/index.js')
 
-var ASQ = require('asynquence')
 var levelmem = require('level-mem')
 
 test('get all posts', function(t) {

@@ -1,7 +1,6 @@
 var Butler = require('../')
 var test = require('tape-catch')
 var createServer = require('./fakeo_remote_server/index.js')
-var ASQ = require('asynquence')
 var levelmem = require('level-mem')
 
 test('no server running', function(t) {
