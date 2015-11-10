@@ -16,21 +16,22 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tape ./test/*.js"
+    "test": "tape ./test/*.js | faucet"
   },
   "devDependencies": {
     "asynquence": "~0.1.1-a",
+    "faucet": "0.0.1",
     "level-mem": "~0.18.0",
     "send": "~0.1.4",
     "tape": "^4.0.0",
     "tape-catch": "^1.0.4"
   },
   "dependencies": {
-    "extend": "^2.0.0",
     "levelup-cache": "^2.0.0",
     "noddity-retrieval": "~1.5.0",
     "run-parallel": "^1.1.2",
     "subleveldown": "^2.0.0",
-    "weak-type-wizard": "^1.2.4"
+    "weak-type-wizard": "^1.2.4",
+    "xtend": "4.0.1"
   }
 }

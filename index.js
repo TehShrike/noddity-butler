@@ -2,7 +2,7 @@ var EventEmitter = require('events').EventEmitter
 var sub = require('subleveldown')
 var Wizard = require('weak-type-wizard')
 var NoddityRetrieval = require('noddity-retrieval')
-var extend = require('extend')
+var extend = require('xtend')
 
 var reflect = require('./lib/reflect.js')
 var PostIndexManager = require('./lib/index_manager.js')
@@ -27,7 +27,7 @@ module.exports = function NoddityButler(host, levelUpDb, options) {
 	// Host can be either a noddity retrieval object/stub, or a host string to be passed in to one
 	var retrieval = typeof host === 'string' ? new NoddityRetrieval(host) : host
 	var emitter = new EventEmitter()
-	options = extend({}, options)
+	options = extend(options)
 
 	var butler = Object.create(emitter)
 
