@@ -33,5 +33,6 @@
     "subleveldown": "^2.0.0",
     "weak-type-wizard": "^1.2.4",
     "xtend": "4.0.1"
-  }
+  },
+  "license": "WTFPL"
 }
