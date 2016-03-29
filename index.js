@@ -27,7 +27,9 @@ module.exports = function NoddityButler(host, levelUpDb, options) {
 	// Host can be either a noddity retrieval object/stub, or a host string to be passed in to one
 	var retrieval = typeof host === 'string' ? new NoddityRetrieval(host) : host
 	var emitter = new EventEmitter()
-	options = extend(options)
+	options = extend({
+		loadPostsOnIndexChange: true
+	}, options)
 
 	var butler = Object.create(emitter)
 
@@ -49,7 +51,9 @@ module.exports = function NoddityButler(host, levelUpDb, options) {
 	reflect('change', postManager, emitter, 'post changed')
 	reflect('change', indexManager, emitter, 'index changed')
 
-	indexManager.on('change', indexManager.getPosts)
+	if (options.loadPostsOnIndexChange) {
+		indexManager.on('change', indexManager.getPosts)
+	}
 
 	function getPosts(options, cb) {
 		if (typeof options === 'function') {

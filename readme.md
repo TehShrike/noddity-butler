@@ -16,7 +16,8 @@ var butler = new Butler(noddityUrlString | noddityRetrieval, levelUpDb, [options
 - `levelUpDb` - any [levelUP](https://github.com/rvagg/node-levelup) object
 - `options` - an optional object with two properties:
 	- `refreshEvery`: in milliseconds, how often the butler should automatically check the server to see if the index or a post has changed.  Defaults to 12 hours for posts and 10 minutes for the index
-	- `cacheCheckIntervalMs`: passed to the [expire-unused-keys](https://www.npmjs.com/package/expire-unused-keys) library to determine how often it should check to see if anything needs to be refreshed.  Defaults to 1000ms
+	- `cacheCheckIntervalMs`: passed to the [expire-unused-keys](https://www.npmjs.com/package/expire-unused-keys) library to determine how often it should check to see if anything needs to be refreshed.  Defaults to 1000ms,
+	- `loadPostsOnIndexChange`: defaults to `true`.  If true, any posts that do not exist locally will be downloaded whenever the `index.json` file changes (including the first time the butler is instantiated with an empty cache).
 
 ## API
 
