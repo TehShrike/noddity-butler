@@ -1,6 +1,6 @@
 {
   "name": "noddity-butler",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "main": "./index.js",
   "author": {
     "name": "TehShrike",
