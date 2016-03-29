@@ -49,3 +49,62 @@ test("Butler emits events from the IndexManager", function(t) {
 
 	retrieval.addPost('heh', 'hurrrrrrr', new Date(), 'dur')
 })
+
+test('Butler fetches remote posts when started on a fresh cache', function(t) {
+	t.plan(1)
+
+	var retrieval = {
+		getIndex: function(cb) {
+			setTimeout(function() {
+				cb(null, ['fancy-file.md'])
+			}, 10)
+		},
+		getPost: function(name, cb) {
+			t.equal(name, 'fancy-file.md')
+			process.nextTick(function() {
+				cb(null, {
+					metadata: {
+						title: 'fancy',
+						date: new Date()
+					},
+					content: 'yup'
+				})
+				butler.stop()
+				t.end()
+			})
+		}
+	}
+
+	var db = levelmem('no location', { valueEncoding: require('./retrieval/encoding.js') })
+	var butler = new Butler(retrieval, db, {
+		refreshEvery: 100
+	})
+
+	t.timeoutAfter(1000)
+})
+
+test('Butler does not fetch remote posts when the option is passed in', function(t) {
+	t.plan(0)
+
+	var retrieval = {
+		getIndex: function(cb) {
+			setTimeout(function() {
+				cb(null, ['fancy-file.md'])
+			}, 10)
+		},
+		getPost: function(name, cb) {
+			t.fail('getPost should not be called')
+		}
+	}
+
+	var db = levelmem('no location', { valueEncoding: require('./retrieval/encoding.js') })
+	var butler = new Butler(retrieval, db, {
+		refreshEvery: 100,
+		loadPostsOnIndexChange: false
+	})
+
+	setTimeout(function() {
+		butler.stop()
+		t.end()
+	}, 1000)
+})
