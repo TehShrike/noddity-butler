@@ -9,16 +9,19 @@ test('respects post rate limiting', function(t) {
 	var limit = 2
 	t.timeoutAfter(1000)
 
+	var requestedSoFar = 0
 	var currentlyBeingRequested = 0
-	var indexJson = ['1.md','2.md','3.md','4.md','5.md','6.md','7.md']
+	var indexJson = ['0.md', '1.md','2.md','3.md','4.md','5.md','6.md','7.md']
 
 	var retrieval = {
 		getIndex: function(cb) {
 			cb(null, indexJson)
 		},
 		getPost: function(name, cb) {
+			t.equal(name, requestedSoFar + '.md', 'File was requested in the expected order')
+			requestedSoFar++
 			currentlyBeingRequested++
-			t.ok(currentlyBeingRequested <= limit)
+			t.ok(currentlyBeingRequested <= limit, 'Hasn\'t gone over the request limit')
 			setTimeout(function() {
 				currentlyBeingRequested--
 				cb(null, {
@@ -38,9 +41,17 @@ test('respects post rate limiting', function(t) {
 		parallelPostRequests: limit
 	})
 
+	var postsReturned = false
+
 	postManager.getPosts(indexJson, function(err, posts) {
+		postsReturned = true
 		t.notOk(err)
 		t.equal(posts.length, indexJson.length)
+	})
+
+	postManager.getPost('8.md', function(err, post) {
+		t.notOk(err)
+		t.ok(postsReturned, 'Getting the single post should be queued up until after the list of posts has returned')
 		t.end()
 	})
 })
@@ -53,7 +64,7 @@ test('defaults to no rate limiting', function(t) {
 	var requestedSoFar = 0
 	var returnedSoFar = 0
 	var currentlyBeingRequested = 0
-	var indexJson = ['1.md','2.md','3.md','4.md','5.md','6.md','7.md']
+	var indexJson = ['0.md', '1.md','2.md','3.md','4.md','5.md','6.md','7.md']
 	var previouslyRequestedNames = {}
 
 	var retrieval = {
@@ -100,7 +111,7 @@ test('Butler integration', function(t) {
 	t.timeoutAfter(1000)
 
 	var currentlyBeingRequested = 0
-	var indexJson = ['1.md','2.md','3.md','4.md','5.md','6.md','7.md']
+	var indexJson = ['0.md', '1.md','2.md','3.md','4.md','5.md','6.md','7.md']
 
 	var retrieval = {
 		getIndex: function(cb) {
