@@ -18,6 +18,7 @@ var butler = new Butler(noddityUrlString | noddityRetrieval, levelUpDb, [options
 	- `refreshEvery`: in milliseconds, how often the butler should automatically check the server to see if the index or a post has changed.  Defaults to 12 hours for posts and 10 minutes for the index
 	- `cacheCheckIntervalMs`: passed to the [expire-unused-keys](https://www.npmjs.com/package/expire-unused-keys) library to determine how often it should check to see if anything needs to be refreshed.  Defaults to 1000ms,
 	- `loadPostsOnIndexChange`: defaults to `true`.  If true, any posts that do not exist locally will be downloaded whenever the `index.json` file changes (including the first time the butler is instantiated with an empty cache).
+	- `parallelPostRequests`: defaults to `undefined`.  If set to a number, the butler will make sure that no more than that number of requests for posts are happening at a time.  See these [browser limits on XHRs](http://www.browserscope.org/?category=network) - maybe consider limiting it to 4 or so.
 
 ## API
 
