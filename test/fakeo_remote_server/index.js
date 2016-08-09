@@ -3,7 +3,7 @@ var send = require('send')
 
 module.exports = function(port, delay) {
 	var server = require('http').createServer(function(req, res) {
-		var respond = function() {
+		function respond() {
 			send(req, url.parse(req.url).pathname)
 				.root(__dirname)
 				.pipe(res)
