@@ -52,3 +52,38 @@ test("Loading the index from levelUP instead of the retrieval object", function(
 		t.end()
 	})
 })
+
+test("index_manager.refreshPost([cb]) works", function(t) {
+	var retrieval = new TestRetrieval()
+
+	var postManager = new PostManager(retrieval, levelmem('no location, seriously', { valueEncoding: 'json' }))
+	var indexManager = new IndexManager(retrieval, postManager, levelmem('no location, seriously', { valueEncoding: 'json' }))
+
+	retrieval.addPost('name', 'title', '2015-01-01', 'CONTENT lolz')
+
+	indexManager.getPosts(function(err, posts) { // Get the posts initially
+		t.ifError(err)
+		t.equal(posts.length, 1)
+
+		retrieval.addPost('name 2', 'title 2', '2015-01-02', 'CONTENT 2 lolz') // Add another post
+
+		indexManager.getPosts(function(err, posts) { // Get the posts again, expect cached posts
+			t.ifError(err)
+			t.equal(posts.length, 1)
+
+			indexManager.refresh(function (err, posts) { // Refresh the posts (testing this functionality)
+				t.ifError(err)
+				t.equal(posts.length, 2)
+
+				indexManager.refresh(function (err, posts) { // Get the posts yet again, expect them to be refreshed
+					t.ifError(err)
+					t.equal(posts.length, 2)
+
+					postManager.stop()
+					indexManager.stop()
+					t.end()
+				})
+			})
+		})
+	})
+})

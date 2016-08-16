@@ -50,6 +50,10 @@ Returns true if all of the posts listed in the index.json file have been downloa
 
 Updates the cache by downloading the latest version of the post from the server.  The optional callback returns the post.
 
+### butler.refreshIndex([cb])
+
+Updates the cache by downloading the latest version of the index.json from the server.  The optional callback returns the index.json contents as an array.
+
 ### butler.stop()
 
 Makes the butler stop automatically refreshing content from the server.
