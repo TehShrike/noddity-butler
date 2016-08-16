@@ -75,7 +75,7 @@ test("index_manager.refreshPost([cb]) works", function(t) {
 				t.ifError(err)
 				t.equal(posts.length, 2)
 
-				indexManager.refresh(function (err, posts) { // Get the posts yet again, expect them to be refreshed
+				indexManager.getPosts(function (err, posts) { // Get the posts yet again, expect them to be refreshed
 					t.ifError(err)
 					t.equal(posts.length, 2)
 
