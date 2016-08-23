@@ -80,6 +80,7 @@ module.exports = function NoddityButler(host, levelUpDb, options) {
 	butler.stop = stop
 	butler.refreshPost = postManager.refresh
 	butler.refreshIndex = indexManager.refresh
+	butler.removePost = postManager.remove
 
 	return butler
 }
