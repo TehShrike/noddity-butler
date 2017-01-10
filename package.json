@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "levelup-cache": "~2.2.0",
-    "noddity-retrieval": "~1.5.0",
+    "noddity-retrieval": "~1.6.0",
     "run-parallel": "^1.1.2",
     "subleveldown": "^2.0.0",
     "weak-type-wizard": "^1.2.4",
