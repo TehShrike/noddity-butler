@@ -22,7 +22,7 @@
     "asynquence": "~0.1.1-a",
     "faucet": "0.0.1",
     "level-mem": "~0.18.0",
-    "send": "~0.1.4",
+    "send": "~0.14.2",
     "tape": "^4.0.0",
     "tape-catch": "^1.0.4"
   },
