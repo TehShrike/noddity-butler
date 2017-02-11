@@ -19,7 +19,7 @@
     "test": "tape ./test/*.js | faucet"
   },
   "devDependencies": {
-    "asynquence": "~0.1.1-a",
+    "asynquence": "~0.10.0",
     "faucet": "0.0.1",
     "level-mem": "~0.18.0",
     "send": "~0.14.2",
@@ -27,7 +27,7 @@
     "tape-catch": "^1.0.4"
   },
   "dependencies": {
-    "levelup-cache": "~2.2.0",
+    "levelup-cache": "~2.3.0",
     "noddity-retrieval": "~1.6.0",
     "run-parallel": "^1.1.2",
     "subleveldown": "^2.0.0",
