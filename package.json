@@ -27,7 +27,7 @@
     "tape-catch": "^1.0.4"
   },
   "dependencies": {
-    "levelup-cache": "~2.2.0",
+    "levelup-cache": "~2.3.0",
     "noddity-retrieval": "~1.6.0",
     "run-parallel": "^1.1.2",
     "subleveldown": "^2.0.0",
