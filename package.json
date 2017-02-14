@@ -19,7 +19,7 @@
     "test": "tape ./test/*.js | faucet"
   },
   "devDependencies": {
-    "asynquence": "~0.1.1-a",
+    "asynquence": "~0.10.0",
     "faucet": "0.0.1",
     "level-mem": "~0.18.0",
     "send": "~0.14.2",
