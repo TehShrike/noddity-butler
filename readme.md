@@ -3,6 +3,8 @@
 Noddity Butler
 =====
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/TehShrike/noddity-butler.svg)](https://greenkeeper.io/)
+
 A library for interacting with a Noddity blog server thingy.
 
 ## Instantiation
